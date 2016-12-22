@@ -1,8 +1,12 @@
 local awful = require("awful")
 local naughty = require("naughty")
 
-local poppin = {}
+local poppin = { statusbarSize = 0 }
 poppin.apps = {}
+
+function poppin.statusbarSize(size)
+    poppin.statusbar = size
+end
 
 function poppin.init(name, command, position, size)
     local prog = {}
@@ -14,7 +18,6 @@ function poppin.init(name, command, position, size)
     poppin.spawn(name, command, position, size)
 end
 
--- TODO: take statusbar into account
 function poppin.generatePosition(position, size)
     local geometry = awful.screen.focused().geometry
     local x, y, width, height
@@ -25,22 +28,22 @@ function poppin.generatePosition(position, size)
         height = size
     elseif position == "bottom" then
         x = 0
-        y = geometry.height - size
+        y = geometry.height - size - poppin.statusbar
         width = geometry.width
         height = size
     elseif position == "left" then
         x = 0
         y = 0
         width = size
-        height = geometry.height
+        height = geometry.height - poppin.statusbar
     elseif position == "right" then
         x = geometry.width - size
         y = 0
         width = size
-        height = geometry.height
+        height = geometry.height - poppin.statusbar
     else -- position == "center"
         x = (geometry.width - size) / 2
-        y = (geometry.height - size) / 2
+        y = (geometry.height- poppin.statusbar - size) / 2
         width = size
         height = size
     end
