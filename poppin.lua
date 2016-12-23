@@ -1,5 +1,4 @@
 local awful = require("awful")
-local naughty = require("naughty")
 
 local poppin = { statusbarSize = 0 }
 poppin.apps = {}
@@ -55,15 +54,16 @@ function poppin.generatePosition(position, size)
     return { x = x, y = y, width = width, height = height }
 end
 
-function poppin.spawn(name, command, rules)
+function poppin.spawn(name)
     poppin.manage = function (c)
-        poppin.new(name, c, rules)
+        poppin.new(name, c)
         poppin.manage = function () end
     end
-    awful.spawn(command)
+    awful.spawn(poppin.apps[name].command)
 end
 
-function poppin.new(name, c, rules)
+function poppin.new(name, c)
+    local rules = poppin.apps[name].rules
     poppin.apps[name].client = c
 
     c.floating = rules.floating
@@ -86,20 +86,28 @@ function poppin.toggle(name)
     local c = app.client
     if c ~= nil then
         if c.first_tag ~= awful.screen.focused().selected_tag then
-            naughty.notify({title=c.first_tag.index})
             c:move_to_tag(awful.screen.focused().selected_tag)
             c.minimized = false;
-            -- TODO: Not working?
-            c:raise()
         else
             c.minimized = not c.minimized
-            if not c.minimized then
-                -- TODO: Not working?
-                c:raise()
-            end
         end
-    elseif app.command ~= nil then
-        poppin.spawn(name, app.command)
+        if not c.minimized then
+            client.focus = c
+            c:raise()
+        end
+    end
+end
+
+function poppin.pop(name, command, position, size)
+    local app = poppin.apps[name]
+    if app ~= nil then
+        if app.client ~= nil then
+            poppin.toggle(name)
+        else
+            poppin.spawn(name)
+        end
+    else
+        poppin.init(name, command, position, size)
     end
 end
 
