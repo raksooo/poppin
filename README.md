@@ -28,3 +28,6 @@ awful.key({ super }, "z", function () poppin.pop("terminal", "urxvt", "center", 
           {description = "Opens a poppin terminal", group = "poppin"}),
 ```
 
+## Dependencies
+* Awesome wm
+
