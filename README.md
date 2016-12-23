@@ -22,10 +22,10 @@ poppin.pop(...) toggles the client if used multiple times.
 poppin.pop("messenger", "messengerfordesktop", "right", 1000)
 
 awful.key({ super }, "x", function () poppin.pop("messenger", "messengerfordesktop", "right", 1000) end,
-          {description = "Opens a poppin messenger window", group = "poppin"}),
+          {description = "Opens a poppin' messenger window", group = "poppin"}),
 
 awful.key({ super }, "z", function () poppin.pop("terminal", "urxvt", "center", 1000) end,
-          {description = "Opens a poppin terminal", group = "poppin"}),
+          {description = "Opens a poppin' terminal", group = "poppin"}),
 ```
 
 ## Dependencies
