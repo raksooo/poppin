@@ -3,6 +3,11 @@ local naughty = require("naughty")
 
 local poppin = { statusbarSize = 0 }
 poppin.apps = {}
+poppin.manage = function () end
+
+client.connect_signal("manage", function (c)
+    poppin.manage(c)
+end)
 
 function poppin.statusbarSize(size)
     poppin.statusbar = size
@@ -11,11 +16,11 @@ end
 function poppin.init(name, command, position, size)
     local prog = {}
     prog.command = command
-    prog.position = position
-    prog.size = size
+    prog.rules = poppin.generatePosition(position, size)
+    prog.rules.floating = true
     poppin.apps[name] = prog
 
-    poppin.spawn(name, command, position, size)
+    poppin.spawn(name, command, prog.rules)
 end
 
 function poppin.generatePosition(position, size)
@@ -50,14 +55,22 @@ function poppin.generatePosition(position, size)
     return { x = x, y = y, width = width, height = height }
 end
 
-function poppin.spawn(name, command, position, size)
-    local rules = poppin.generatePosition(position, size)
-    rules.floating = true
-    awful.spawn(command, rules, function(c) poppin.new(name, c) end)
+function poppin.spawn(name, command, rules)
+    poppin.manage = function (c)
+        poppin.new(name, c, rules)
+        poppin.manage = function () end
+    end
+    awful.spawn(command)
 end
 
-function poppin.new(name, c)
+function poppin.new(name, c, rules)
     poppin.apps[name].client = c
+
+    c.floating = rules.floating
+    c.x = rules.x
+    c.y = rules.y
+    c.width = rules.width
+    c.height = rules.height
 
     c:connect_signal("unmanage", function()
         poppin.apps[name].client = nil
@@ -76,6 +89,7 @@ function poppin.toggle(name)
             naughty.notify({title=c.first_tag.index})
             c:move_to_tag(awful.screen.focused().selected_tag)
             c.minimized = false;
+            -- TODO: Not working?
             c:raise()
         else
             c.minimized = not c.minimized
