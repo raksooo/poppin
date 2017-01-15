@@ -12,11 +12,15 @@ function poppin.statusbarSize(size)
     poppin.statusbar = size
 end
 
-function poppin.init(name, command, position, size)
+function poppin.init(name, command, position, size, rules, callback)
     local prog = {}
     prog.command = command
-    prog.rules = poppin.generatePosition(position, size)
-    prog.rules.floating = true
+    prog.callback = callback
+    prog.rules = awful.util.table.join(
+        rules,
+        poppin.generatePosition(position, size),
+        { floating = true }
+    )
     poppin.apps[name] = prog
 
     poppin.spawn(name, command, prog.rules)
@@ -63,22 +67,23 @@ function poppin.spawn(name)
 end
 
 function poppin.new(name, c)
-    local rules = poppin.apps[name].rules
-    poppin.apps[name].client = c
+    local app = poppin.apps[name]
+    app.client = c
 
-    c.floating = rules.floating
-    c.x = rules.x
-    c.y = rules.y
-    c.width = rules.width
-    c.height = rules.height
+    for k, v in pairs(app.rules) do
+        c[k] = v
+    end
 
     c:connect_signal("unmanage", function()
-        poppin.apps[name].client = nil
+        app.client = nil
     end)
-
     c:connect_signal("unfocus", function()
         c.minimized = true
     end)
+
+    if app.callback ~= nil then
+        app.callback(c)
+    end
 end
 
 function poppin.toggle(name)
@@ -98,7 +103,7 @@ function poppin.toggle(name)
     end
 end
 
-function poppin.pop(name, command, position, size)
+function poppin.pop(name, command, position, size, rules, callback)
     local app = poppin.apps[name]
     if app ~= nil then
         if app.client ~= nil then
@@ -107,7 +112,7 @@ function poppin.pop(name, command, position, size)
             poppin.spawn(name)
         end
     else
-        poppin.init(name, command, position, size)
+        poppin.init(name, command, position, size, rules, callback)
     end
 end
 
