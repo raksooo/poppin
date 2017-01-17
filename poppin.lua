@@ -18,8 +18,7 @@ function poppin.init(name, command, position, size, rules, callback)
     prog.callback = callback
     prog.rules = awful.util.table.join(
         rules,
-        poppin.generatePosition(position, size),
-        { floating = true }
+        poppin.generatePosition(position, size)
     )
     poppin.apps[name] = prog
 
@@ -70,16 +69,17 @@ function poppin.new(name, c)
     local app = poppin.apps[name]
     app.client = c
 
-    for k, v in pairs(app.rules) do
-        c[k] = v
-    end
-
     c:connect_signal("unmanage", function()
         app.client = nil
     end)
     c:connect_signal("unfocus", function()
         c.minimized = true
     end)
+
+    c.floating = true
+    for k, v in pairs(app.rules) do
+        c[k] = v
+    end
 
     if app.callback ~= nil then
         app.callback(c)
