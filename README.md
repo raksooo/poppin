@@ -9,7 +9,7 @@ git clone https://github.com/raksooo/poppin.git .config/awesome/poppin
 ## Usage
 In your lua.rc:
 ```lua
-poppin = require('poppin/poppin')
+poppin = require('poppin')
 poppin.pop(name, command, position, size, [rules], [callback])
 ```
 

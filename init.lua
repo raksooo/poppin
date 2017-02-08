@@ -116,5 +116,14 @@ function poppin.pop(name, command, position, size, rules, callback)
     end
 end
 
+function poppin.isPoppinClient(c)
+    for name, app in pairs(poppin.apps) do
+        if app.client == c then
+            return true
+        end
+    end
+    return false
+end
+
 return poppin
 
