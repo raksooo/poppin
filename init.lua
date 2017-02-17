@@ -1,16 +1,12 @@
 local awful = require("awful")
 
-local poppin = { statusbarSize = 0 }
-poppin.apps = {}
+local poppin = { }
+poppin.apps = { }
 poppin.manage = function () end
 
 client.connect_signal("manage", function (c)
     poppin.manage(c)
 end)
-
-function poppin.statusbarSize(size)
-    poppin.statusbar = size
-end
 
 function poppin.init(name, command, position, size, rules, callback)
     local prog = {}
@@ -26,35 +22,24 @@ function poppin.init(name, command, position, size, rules, callback)
 end
 
 function poppin.generatePosition(position, size)
-    local geometry = awful.screen.focused().geometry
-    local x, y, width, height
-    if position == "top" then
-        x = 0
-        y = 0
-        width = geometry.width
-        height = size
-    elseif position == "bottom" then
-        x = 0
-        y = geometry.height - size - poppin.statusbar
-        width = geometry.width
-        height = size
-    elseif position == "left" then
-        x = 0
-        y = 0
-        width = size
-        height = geometry.height - poppin.statusbar
-    elseif position == "right" then
-        x = geometry.width - size
-        y = 0
-        width = size
-        height = geometry.height - poppin.statusbar
-    else -- position == "center"
-        x = (geometry.width - size) / 2
-        y = (geometry.height- poppin.statusbar - size) / 2
-        width = size
-        height = size
+    local rules = { }
+
+    if position == "top" or position == "bottom" or position == "center" then
+        rules.height = size
+    end if position == "left" or position == "right" or positionn == "center" then
+        rules.width = size
     end
-    return { x = x, y = y, width = width, height = height }
+
+    local placement = {
+        top = awful.placement.top + awful.placement.maximize_horizontally,
+        bottom = awful.placement.bottom + awful.placement.maximize_horizontally,
+        left = awful.placement.left + awful.placement.maximize_vertically,
+        right = awful.placement.right + awful.placement.maximize_vertically,
+        center = awful.placement.centered
+    }
+    rules.placement = placement[position]
+
+    return rules
 end
 
 function poppin.spawn(name)
@@ -69,17 +54,11 @@ function poppin.new(name, c)
     local app = poppin.apps[name]
     app.client = c
 
-    c:connect_signal("unmanage", function()
-        app.client = nil
-    end)
-    c:connect_signal("unfocus", function()
-        c.minimized = true
-    end)
+    c:connect_signal("unmanage", function() app.client = nil end)
+    c:connect_signal("unfocus", function() c.minimized = true end)
 
     c.floating = true
-    for k, v in pairs(app.rules) do
-        c[k] = v
-    end
+    awful.rules.execute(c, app.rules)
 
     if app.callback ~= nil then
         app.callback(c)
