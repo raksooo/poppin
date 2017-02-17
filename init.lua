@@ -8,7 +8,7 @@ client.connect_signal("manage", function (c)
     poppin.manage(c)
 end)
 
-function poppin.init(name, command, position, size, rules, callback)
+function init(name, command, position, size, rules, callback)
     local prog = {}
     prog.command = command
     prog.callback = callback
@@ -18,7 +18,7 @@ function poppin.init(name, command, position, size, rules, callback)
     )
     poppin.apps[name] = prog
 
-    poppin.spawn(name, command, prog.rules)
+    spawn(name, command, prog.rules)
 end
 
 function poppin.generatePosition(position, size)
@@ -42,7 +42,7 @@ function poppin.generatePosition(position, size)
     return rules
 end
 
-function poppin.spawn(name)
+function spawn(name)
     poppin.manage = function (c)
         poppin.new(name, c)
         poppin.manage = function () end
@@ -54,7 +54,6 @@ function poppin.new(name, c)
     local app = poppin.apps[name]
     app.client = c
 
-    c:connect_signal("unmanage", function() app.client = nil end)
     c:connect_signal("unfocus", function() c.minimized = true end)
 
     c.floating = true
@@ -66,28 +65,25 @@ function poppin.new(name, c)
     end
 end
 
-function poppin.toggle(name)
-    local app = poppin.apps[name]
-    local c = app.client
-    if c ~= nil then
-        c.minimized = not c.minimized
-        if not c.minimized then
-            client.focus = c
-            c:raise()
-        end
+function toggle(name)
+    local c = poppin.apps[name].client
+    c.minimized = not c.minimized
+    if not c.minimized then
+        client.focus = c
+        c:raise()
     end
 end
 
 function poppin.pop(name, command, position, size, rules, callback)
     local app = poppin.apps[name]
     if app ~= nil then
-        if app.client ~= nil then
-            poppin.toggle(name)
+        if app.client.valid then
+            toggle(name)
         else
-            poppin.spawn(name)
+            spawn(name)
         end
     else
-        poppin.init(name, command, position, size, rules, callback)
+        init(name, command, position, size, rules, callback)
     end
 end
 
