@@ -4,6 +4,12 @@ local poppin = { }
 local apps = { }
 local manage = function () end
 
+local defaultProperties = {
+    floating = true,
+    sticky = true,
+    ontop = true
+}
+
 client.connect_signal("manage", function (c)
     manage(c)
 end)
@@ -48,8 +54,7 @@ function new(name, c)
     local app = apps[name]
     app.client = c
 
-    c.floating = true
-    c.sticky = true
+    awful.rules.execute(c, defaultProperties)
     awful.rules.execute(c, app.properties)
 
     c:connect_signal("unfocus", function()
@@ -63,7 +68,6 @@ function toggle(name)
     local c = apps[name].client
     c.minimized = not c.minimized
     if not c.minimized then
-        c:raise()
         client.focus = c
     end
 end
