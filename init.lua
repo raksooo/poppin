@@ -2,32 +2,26 @@ local awful = require("awful")
 
 local poppin = { }
 poppin.apps = { }
-poppin.manage = function () end
+local manage = function () end
 
 client.connect_signal("manage", function (c)
-    poppin.manage(c)
+    manage(c)
 end)
 
-function init(name, command, position, size, rules, callback)
-    local prog = {}
-    prog.command = command
-    prog.callback = callback
-    prog.rules = awful.util.table.join(
-        rules,
-        poppin.generatePosition(position, size)
-    )
-    poppin.apps[name] = prog
-
-    spawn(name, command, prog.rules)
+function init(name, command, position, size, properties, callback)
+    poppin.apps[name] = {
+        command = command,
+        callback = callback,
+        properties = geometry(properties or {}, position, size)
+    }
+    spawn(name)
 end
 
-function poppin.generatePosition(position, size)
-    local rules = { }
-
+function geometry(properties, position, size)
     if position == "top" or position == "bottom" or position == "center" then
-        rules.height = size
+        properties.height = size
     end if position == "left" or position == "right" or positionn == "center" then
-        rules.width = size
+        properties.width = size
     end
 
     local placement = {
@@ -37,20 +31,20 @@ function poppin.generatePosition(position, size)
         right = awful.placement.right + awful.placement.maximize_vertically,
         center = awful.placement.centered
     }
-    rules.placement = placement[position]
+    properties.placement = placement[position]
 
-    return rules
+    return properties
 end
 
 function spawn(name)
-    poppin.manage = function (c)
-        poppin.new(name, c)
-        poppin.manage = function () end
+    manage = function (c)
+        new(name, c)
+        manage = function () end
     end
     awful.spawn(poppin.apps[name].command)
 end
 
-function poppin.new(name, c)
+function new(name, c)
     local app = poppin.apps[name]
     app.client = c
 
@@ -58,11 +52,9 @@ function poppin.new(name, c)
 
     c.floating = true
     c.sticky = true
-    awful.rules.execute(c, app.rules)
+    awful.rules.execute(c, app.properties)
 
-    if app.callback ~= nil then
-        app.callback(c)
-    end
+    if app.callback ~= nil then app.callback(c) end
 end
 
 function toggle(name)
@@ -74,7 +66,7 @@ function toggle(name)
     end
 end
 
-function poppin.pop(name, command, position, size, rules, callback)
+function poppin.pop(name, command, position, size, properties, callback)
     local app = poppin.apps[name]
     if app ~= nil then
         if app.client.valid then
@@ -83,8 +75,10 @@ function poppin.pop(name, command, position, size, rules, callback)
             spawn(name)
         end
     else
-        init(name, command, position, size, rules, callback)
+        init(name, command, position, size, properties, callback)
     end
+
+    return function () poppin.pop(name) end
 end
 
 function poppin.isPoppinClient(c)
