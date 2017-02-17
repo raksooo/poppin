@@ -1,7 +1,7 @@
 local awful = require("awful")
 
 local poppin = { }
-poppin.apps = { }
+local apps = { }
 local manage = function () end
 
 client.connect_signal("manage", function (c)
@@ -9,7 +9,7 @@ client.connect_signal("manage", function (c)
 end)
 
 function init(name, command, position, size, properties, callback)
-    poppin.apps[name] = {
+    apps[name] = {
         command = command,
         callback = callback,
         properties = geometry(properties or {}, position, size)
@@ -41,11 +41,11 @@ function spawn(name)
         new(name, c)
         manage = function () end
     end
-    awful.spawn(poppin.apps[name].command)
+    awful.spawn(apps[name].command)
 end
 
 function new(name, c)
-    local app = poppin.apps[name]
+    local app = apps[name]
     app.client = c
 
     c:connect_signal("unfocus", function() c.minimized = true end)
@@ -58,7 +58,7 @@ function new(name, c)
 end
 
 function toggle(name)
-    local c = poppin.apps[name].client
+    local c = apps[name].client
     c.minimized = not c.minimized
     if not c.minimized then
         client.focus = c
@@ -67,7 +67,7 @@ function toggle(name)
 end
 
 function poppin.pop(name, command, position, size, properties, callback)
-    local app = poppin.apps[name]
+    local app = apps[name]
     if app ~= nil then
         if app.client.valid then
             toggle(name)
@@ -82,7 +82,7 @@ function poppin.pop(name, command, position, size, properties, callback)
 end
 
 function poppin.isPoppinClient(c)
-    for name, app in pairs(poppin.apps) do
+    for name, app in pairs(apps) do
         if app.client == c then
             return true
         end
