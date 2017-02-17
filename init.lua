@@ -58,6 +58,7 @@ function poppin.new(name, c)
     c:connect_signal("unfocus", function() c.minimized = true end)
 
     c.floating = true
+    c.sticky = true
     awful.rules.execute(c, app.rules)
 
     if app.callback ~= nil then
@@ -69,12 +70,7 @@ function poppin.toggle(name)
     local app = poppin.apps[name]
     local c = app.client
     if c ~= nil then
-        if c.first_tag ~= awful.screen.focused().selected_tag then
-            c:move_to_tag(awful.screen.focused().selected_tag)
-            c.minimized = false;
-        else
-            c.minimized = not c.minimized
-        end
+        c.minimized = not c.minimized
         if not c.minimized then
             client.focus = c
             c:raise()
