@@ -48,11 +48,13 @@ function new(name, c)
     local app = apps[name]
     app.client = c
 
-    c:connect_signal("unfocus", function() c.minimized = true end)
-
     c.floating = true
     c.sticky = true
     awful.rules.execute(c, app.properties)
+
+    c:connect_signal("unfocus", function()
+        c.minimized = true
+    end)
 
     if app.callback ~= nil then app.callback(c) end
 end
@@ -61,21 +63,19 @@ function toggle(name)
     local c = apps[name].client
     c.minimized = not c.minimized
     if not c.minimized then
-        client.focus = c
         c:raise()
+        client.focus = c
     end
 end
 
 function poppin.pop(name, command, position, size, properties, callback)
     local app = apps[name]
-    if app ~= nil then
-        if app.client.valid then
-            toggle(name)
-        else
-            spawn(name)
-        end
-    else
+    if app == nil then
         init(name, command, position, size, properties, callback)
+    elseif app.client.valid then
+        toggle(name)
+    else
+        spawn(name)
     end
 
     return function () poppin.pop(name) end
