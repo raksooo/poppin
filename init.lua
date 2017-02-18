@@ -1,18 +1,10 @@
 local awful = require("awful")
 
-local poppin = { }
 local apps = { }
 local manage = function () end
+local defaultProperties = { floating = true, sticky = true, ontop = true }
 
-local defaultProperties = {
-    floating = true,
-    sticky = true,
-    ontop = true
-}
-
-client.connect_signal("manage", function (c)
-    manage(c)
-end)
+client.connect_signal("manage", function (c) manage(c) end)
 
 function init(name, command, position, size, properties, callback)
     apps[name] = {
@@ -56,10 +48,7 @@ function new(name, c)
 
     awful.rules.execute(c, defaultProperties)
     awful.rules.execute(c, app.properties)
-
-    c:connect_signal("unfocus", function()
-        c.minimized = true
-    end)
+    c:connect_signal("unfocus", function() c.minimized = true end)
 
     if app.callback ~= nil then app.callback(c) end
 end
@@ -72,20 +61,20 @@ function toggle(name)
     end
 end
 
-function poppin.pop(name, command, position, size, properties, callback)
+function pop(name, command, position, size, properties, callback)
     local app = apps[name]
     if app == nil then
         init(name, command, position, size, properties, callback)
-    elseif app.client.valid then
+    elseif app.client ~= nil and app.client.valid then
         toggle(name)
-    else
+    elseif app.client ~= nil then
         spawn(name)
     end
 
-    return function () poppin.pop(name) end
+    return function () pop(name) end
 end
 
-function poppin.isPoppinClient(c)
+function isPoppinClient(c)
     for name, app in pairs(apps) do
         if app.client == c then
             return true
@@ -94,5 +83,5 @@ function poppin.isPoppinClient(c)
     return false
 end
 
-return poppin
+return { pop = pop, isPoppinClient = isPoppinClient }
 
