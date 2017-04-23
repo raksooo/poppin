@@ -44,9 +44,11 @@ end
 
 function new(name, c)
     local app = apps[name]
+    local props = app.properties
     app.client = c
 
     awful.rules.execute(c, defaultProperties)
+    awful.rules.execute(c, {width=props.width, height=props.height})
     awful.rules.execute(c, app.properties)
     c:connect_signal("unfocus", function() c.minimized = true end)
 
