@@ -18,7 +18,7 @@ end
 function geometry(properties, position, size)
     if position == "top" or position == "bottom" or position == "center" then
         properties.height = size
-    end if position == "left" or position == "right" or positionn == "center" then
+    end if position == "left" or position == "right" or position == "center" then
         properties.width = size
     end
 
