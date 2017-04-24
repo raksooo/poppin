@@ -49,7 +49,7 @@ function new(name, c)
 
     awful.rules.execute(c, defaultProperties)
     awful.rules.execute(c, {width=props.width, height=props.height})
-    awful.rules.execute(c, app.properties)
+    awful.rules.execute(c, props)
     c:connect_signal("unfocus", function() c.minimized = true end)
 
     if app.callback ~= nil then app.callback(c) end
