@@ -18,7 +18,7 @@ end
 function geometry(properties, position, size)
     if position == "top" or position == "bottom" or position == "center" then
         properties.height = size
-    end if position == "left" or position == "right" or positionn == "center" then
+    end if position == "left" or position == "right" or position == "center" then
         properties.width = size
     end
 
@@ -44,10 +44,12 @@ end
 
 function new(name, c)
     local app = apps[name]
+    local props = app.properties
     app.client = c
 
     awful.rules.execute(c, defaultProperties)
-    awful.rules.execute(c, app.properties)
+    awful.rules.execute(c, {width=props.width, height=props.height})
+    awful.rules.execute(c, props)
     c:connect_signal("unfocus", function() c.minimized = true end)
 
     if app.callback ~= nil then app.callback(c) end
