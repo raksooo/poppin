@@ -10,7 +10,7 @@ git clone https://github.com/raksooo/poppin.git .config/awesome/poppin
 In your lua.rc:
 ```lua
 local poppin = require('poppin')
-poppin.pop(name, command, position, size, [properties], [callback])
+poppin.pop(name, command, [position], [size], [properties], [callback])
 ```
 
 Where name is a name associated with the client. Command is the shell-command used to start the program. Position can be either "top", "bottom", "left", "right" or center. The size is the width or height (depending on position) in pixels.
@@ -20,10 +20,10 @@ poppin.pop(...) toggles the client if used multiple times, and returns a togglin
 ### Examples
 Creating a poppin client:
 ```lua
-poppin.pop("messenger", "messengerfordesktop", "right", 1000)
+poppin.pop("messenger", "messengerfordesktop", "right")
 poppin.pop("messenger", "messengerfordesktop", "right", 1000, { opacity = 0.9 })
 poppin.pop("messenger", "messengerfordesktop", "right", 1000, {}, function (c)
-    c.kill()
+    c.minimized = true
 end)
 ```
 

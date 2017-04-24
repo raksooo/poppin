@@ -48,7 +48,7 @@ function new(name, c)
     app.client = c
 
     awful.rules.execute(c, defaultProperties)
-    awful.rules.execute(c, {width=props.width, height=props.height})
+    awful.rules.execute(c, { width = props.width, height = props.height })
     awful.rules.execute(c, props)
     c:connect_signal("unfocus", function() c.minimized = true end)
 
@@ -63,10 +63,27 @@ function toggle(name)
     end
 end
 
-function pop(name, command, position, size, properties, callback)
+function handleArguments(arguments)
+    local sortedArguments = {}
+    for k, v in pairs(arguments) do
+        local t = type(v)
+        if t == "string" then sortedArguments.position = v
+        elseif t == "number" then sortedArguments.size = v
+        elseif t == "table" then sortedArguments.properties = v
+        elseif t == "function" then sortedArguments.callback = v
+        end
+    end
+
+    return sortedArguments
+end
+
+function pop(name, command, ...)
+    local args = handleArguments({...})
+
     local app = apps[name]
     if app == nil then
-        init(name, command, position, size, properties, callback)
+        init(name, command, args.position, args.size, args.properties,
+            args.callback)
     elseif app.client ~= nil and app.client.valid then
         toggle(name)
     elseif app.client ~= nil then
