@@ -18,7 +18,7 @@ end
 function restore()
     apps = session.restore()
     for _, app in pairs(apps) do
-        executeRules(app)
+        setProperties(app)
     end
 end
 
@@ -64,18 +64,18 @@ function new(name, c)
     local app = apps[name]
     app.client = c
 
-    executeRules(app)
+    setProperties(app)
     session.save(name, app)
-    c:connect_signal("unfocus", function() c.minimized = true end)
 
     if app.callback ~= nil then app.callback(c) end
 end
 
-function executeRules(app)
+function setProperties(app)
     local props = app.properties
     awful.rules.execute(app.client, defaultProperties)
     awful.rules.execute(app.client, { width = props.width, height = props.height })
     awful.rules.execute(app.client, props)
+    app.client:connect_signal("unfocus", function() app.client.minimized = true end)
 end
 
 function toggle(name)
