@@ -1,15 +1,9 @@
 local session = {}
 
-local properties = {
-    name = "string",
-    command = "string",
-    properties = "string"
-}
-
 function init()
-    for k, v in pairs(properties) do
-        awesome.register_xproperty("poppin." .. k, v)
-    end
+    awesome.register_xproperty("poppin.name", "string")
+    awesome.register_xproperty("poppin.command", "string")
+    awesome.register_xproperty("poppin.properties", "string")
 end
 
 function session.save(name, app)
@@ -23,9 +17,8 @@ function session.restore()
     local apps = {}
     local clients = client.get()
     for _, c in pairs(clients) do
-        local name = c:get_xproperty("poppin.name")
-        if #name > 0 then
-            apps[name] = {
+        if session.isPoppin(c) then
+            apps[c:get_xproperty("poppin.name")] = {
                 command = c:get_xproperty("poppin.command"),
                 properties = deserialize(c:get_xproperty("poppin.properties")),
                 client = c
@@ -34,6 +27,11 @@ function session.restore()
     end
 
     return apps
+end
+
+function session.isPoppin(c)
+    local name = c:get_xproperty("poppin.name")
+    return #name > 0
 end
 
 function serialize(t)

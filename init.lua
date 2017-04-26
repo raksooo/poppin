@@ -5,14 +5,14 @@ local apps = {}
 local manage = function () end
 local defaultProperties = { floating = true, sticky = true, ontop = true }
 
-client.connect_signal("manage", function (c) manage(c) end)
-
-function runRestore()
+function init()
     if awesome.startup then
         awesome.connect_signal("startup", restore)
     else
         restore()
     end
+
+    client.connect_signal("manage", function (c) manage(c) end)
 end
 
 function restore()
@@ -22,7 +22,7 @@ function restore()
     end
 end
 
-function init(name, command, position, size, properties, callback)
+function initClient(name, command, position, size, properties, callback)
     apps[name] = {
         command = command,
         callback = callback,
@@ -105,7 +105,7 @@ function pop(name, command, ...)
 
     local app = apps[name]
     if app == nil then
-        init(name, command, args.position, args.size, args.properties,
+        initClient(name, command, args.position, args.size, args.properties,
             args.callback)
     elseif app.client ~= nil and app.client.valid then
         toggle(name)
@@ -116,15 +116,6 @@ function pop(name, command, ...)
     return function () pop(name) end
 end
 
-function isPoppinClient(c)
-    for name, app in pairs(apps) do
-        if app.client == c then
-            return true
-        end
-    end
-    return false
-end
-
-runRestore()
-return { pop = pop, isPoppinClient = isPoppinClient }
+init()
+return { pop = pop, isPoppin = session.isPoppin }
 
