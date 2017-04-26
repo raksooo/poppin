@@ -13,7 +13,7 @@ local poppin = require('poppin')
 poppin.pop(name, command, [position], [size], [properties], [callback])
 ```
 
-Where name is a name associated with the client. Command is the shell-command used to start the program. Position can be either "top", "bottom", "left", "right" or center. The size is the width or height (depending on position) in pixels.
+Where name is a name associated with the client. Command is the shell-command used to start the program. Position can be either "top", "bottom", "left", "right" or "center". The size is the width or height (depending on position) in pixels.
 
 poppin.pop(...) toggles the client if used multiple times, and returns a toggling function which doesn't require any arguments.
 
