@@ -7,7 +7,7 @@ git clone https://github.com/raksooo/poppin.git .config/awesome/poppin
 ```
 
 ## Usage
-In your lua.rc:
+In your rc.lua:
 ```lua
 local poppin = require('poppin')
 ```
