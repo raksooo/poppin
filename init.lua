@@ -1,6 +1,6 @@
 local awful = require("awful")
 
-local apps = { }
+local apps = {}
 local manage = function () end
 local defaultProperties = { floating = true, sticky = true, ontop = true }
 
@@ -16,10 +16,12 @@ function init(name, command, position, size, properties, callback)
 end
 
 function geometry(properties, position, size)
-    if position == "top" or position == "bottom" or position == "center" then
-        properties.height = size
-    end if position == "left" or position == "right" or position == "center" then
-        properties.width = size
+    if size ~= nil then
+        if position == "top" or position == "bottom" or position == "center" then
+            properties.height = size
+        end if position == "left" or position == "right" or position == "center" then
+            properties.width = size
+        end
     end
 
     local placement = {
