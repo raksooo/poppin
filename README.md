@@ -24,10 +24,9 @@ poppin.pop(...) toggles the client if used multiple times, and returns a togglin
 ### poppin.isPoppin()
 To check if a client is handled by poppin, poppin.isPoppin() can be used.
 ```lua
-poppin.pop(name, command, function (c)
-    poppin.isPoppin(c) -- returns true
-end)
+poppin.isPoppin(client)
 ```
+poppin.isPoppin() returns either true or false.
 
 ### Examples
 Creating a poppin client:
@@ -53,6 +52,13 @@ local poppin_terminal = poppin.pop("terminal", "urxvt", "top", 1000, { border_wi
 
 awful.key({ super }, "x", poppin_terminal,
           {description = "Opens a poppin' messenger window", group = "poppin"}),
+```
+
+Check if a client is a poppin client:
+```lua
+poppin.pop("terminal", "urxvt", function (c)
+    poppin.isPoppin(c) -- returns true
+end)
 ```
 
 ## Dependencies
