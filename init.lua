@@ -1,10 +1,26 @@
 local awful = require("awful")
+local session = require("poppin/session")
 
 local apps = {}
 local manage = function () end
 local defaultProperties = { floating = true, sticky = true, ontop = true }
 
 client.connect_signal("manage", function (c) manage(c) end)
+
+function runRestore()
+    if awesome.startup then
+        awesome.connect_signal("startup", restore)
+    else
+        restore()
+    end
+end
+
+function restore()
+    apps = session.restore()
+    for _, app in pairs(apps) do
+        executeRules(app)
+    end
+end
 
 function init(name, command, position, size, properties, callback)
     apps[name] = {
@@ -46,15 +62,20 @@ end
 
 function new(name, c)
     local app = apps[name]
-    local props = app.properties
     app.client = c
 
-    awful.rules.execute(c, defaultProperties)
-    awful.rules.execute(c, { width = props.width, height = props.height })
-    awful.rules.execute(c, props)
+    executeRules(app)
+    session.save(name, app)
     c:connect_signal("unfocus", function() c.minimized = true end)
 
     if app.callback ~= nil then app.callback(c) end
+end
+
+function executeRules(app)
+    local props = app.properties
+    awful.rules.execute(app.client, defaultProperties)
+    awful.rules.execute(app.client, { width = props.width, height = props.height })
+    awful.rules.execute(app.client, props)
 end
 
 function toggle(name)
@@ -104,5 +125,6 @@ function isPoppinClient(c)
     return false
 end
 
+runRestore()
 return { pop = pop, isPoppinClient = isPoppinClient }
 
