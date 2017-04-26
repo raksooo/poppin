@@ -10,22 +10,32 @@ git clone https://github.com/raksooo/poppin.git .config/awesome/poppin
 In your lua.rc:
 ```lua
 local poppin = require('poppin')
-poppin.pop(name, command, [position], [size], [properties], [callback])
+```
+
+### poppin.pop()
+```lua
+poppin.pop(name, command, [position[, size[, properties[, callback]]]])
 ```
 
 Where name is a name associated with the client. Command is the shell-command used to start the program. Position can be either "top", "bottom", "left", "right" or "center". The size is the width or height (depending on position) in pixels.
 
 poppin.pop(...) toggles the client if used multiple times, and returns a toggling function which doesn't require any arguments.
 
+### poppin.isPoppin()
+To check if a client is handled by poppin, poppin.isPoppin() can be used.
+```lua
+poppin.pop(name, command, function (c)
+    poppin.isPoppin(c) -- returns true
+end)
+```
+
 ### Examples
 Creating a poppin client:
 ```lua
-poppin.pop("messenger", "messengerfordesktop", "right")
+poppin.pop("terminal", "urxvt", "top")
 poppin.pop("terminal", "urxvt", "center", { width = 1000, height = 300 })
-poppin.pop("messenger", "messengerfordesktop", "right", 1000, { opacity = 0.9 })
-poppin.pop("messenger", "messengerfordesktop", "right", 1000, {}, function (c)
-    c.minimized = true
-end)
+poppin.pop("terminal", "urxvt", "top", function (c) c.minimized = true end)
+poppin.pop("messenger", "messengerfordesktop", "right")
 ```
 
 Toggling a poppin window by calling the pop function using the same name:
