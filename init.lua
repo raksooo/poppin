@@ -1,5 +1,5 @@
 local awful = require("awful")
-local session = require("poppin/session")
+local session = require("poppin.session")
 
 local apps = {}
 local manage = function () end
