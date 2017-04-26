@@ -3,7 +3,7 @@ Poppin' is a module for awesome wm which allows the user to toggle a client. You
 
 ## Download
 ```sh
-git clone https://github.com/raksooo/poppin.git .config/awesome/poppin
+git clone https://github.com/raksooo/poppin.git ~/.config/awesome/poppin
 ```
 
 ## Usage
