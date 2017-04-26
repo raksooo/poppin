@@ -1,5 +1,5 @@
 # Poppin'
-Poppin' is a module for awesome wm which allows the user to toggle a client. You could for example have a client which appears on a keyboard shortcut and dissappears when the shortcut is pressed again.
+Poppin' is a module for awesome wm which allows the user to toggle a client. You could for example have a client which appears on a keyboard shortcut and toggles when the shortcut is pressed again. Poppin' clients are persistent between awesome restarts.
 
 ## Download
 ```sh
@@ -21,6 +21,7 @@ poppin.pop(...) toggles the client if used multiple times, and returns a togglin
 Creating a poppin client:
 ```lua
 poppin.pop("messenger", "messengerfordesktop", "right")
+poppin.pop("terminal", "urxvt", "center", { width = 1000, height = 300 })
 poppin.pop("messenger", "messengerfordesktop", "right", 1000, { opacity = 0.9 })
 poppin.pop("messenger", "messengerfordesktop", "right", 1000, {}, function (c)
     c.minimized = true
