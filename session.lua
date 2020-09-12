@@ -53,7 +53,7 @@ function serializeValue(v)
 end
 
 function deserialize(s)
-    return loadstring("return " .. s)()
+    return load("return " .. s)()
 end
 
 init()
